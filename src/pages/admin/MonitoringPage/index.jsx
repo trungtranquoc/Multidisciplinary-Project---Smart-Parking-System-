@@ -1,0 +1,35 @@
+import React, { useEffect, useState } from "react";
+import Header from "../../../components/Header";
+
+// import { defaultPersonalData, samplePrintedFiles } from "../../hardData";
+// import UserService from "../../API/user";
+
+const MonitoringPage = () => {
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+    }
+
+    fetchData();
+    setIsLoading(false);
+  }, [])
+
+  // Loading page
+  if (isLoading) {
+    return (
+      <div className="h-screen w-full flex justify-center items-center">
+        <p className="font-bold text-4xl text-blue">Loading...</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col space-y-5 bg-gray-100 p-6 w-full overflow-y-auto max-h-screen h-screen">
+      <Header pageName="Monitoring Page" description="This is your main page."/>
+    </div>
+  );
+};
+
+export default MonitoringPage;
