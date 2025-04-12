@@ -24,8 +24,8 @@ const Sidebar = () => {
       </a>
       <ul className="flex flex-col w-full items-left">
         <SideBarLink name="Dashboard" hrefLink="/user/dashboard" Icon={DashboardSvg} /> 
-        <SideBarLink name="Personal information" hrefLink="/user/student_information" Icon={PersonalSvg} />
-        <SideBarLink name="Transaction history" hrefLink="/user/parking_history" Icon={HistorySvg} />
+        <SideBarLink name="Personal Information" hrefLink="/user/student_information" Icon={PersonalSvg} />
+        <SideBarLink name="Parking History" hrefLink="/user/parking_history" Icon={HistorySvg} />
       </ul>
       <div className="w-full h-[1px] bg-gray-dark"/>
       <div onClick={logout} className="flex flex-row space-x-3 justify-left px-4 py-3 text-red font-normal w-full cursor-pointer">
