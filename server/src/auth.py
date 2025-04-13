@@ -14,7 +14,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="user/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -24,7 +24,7 @@ def get_password_hash(password):
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc)
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -42,8 +42,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     
     return payload
 
-def require_role(required_role: str, token: str = Depends(oauth2_scheme)):
-    payload = decode_access_token(token)
-    if not payload or payload.get("role") != required_role:
-        raise HTTPException(status_code=403, detail="Access forbidden")
-    return payload
+def require_role(required_role: str):
+    def role_checker(token: str = Depends(oauth2_scheme)):
+        payload = decode_access_token(token)
+        if not payload or payload.get("role") != required_role:
+            raise HTTPException(status_code=403, detail="Access forbidden")
+        return payload
+    return role_checker

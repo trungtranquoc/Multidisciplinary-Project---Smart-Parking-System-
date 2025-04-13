@@ -17,19 +17,17 @@ app = FastAPI(lifespan=lifespan)
 
 @app.post("/login")
 async def login(data: LoginRequest):
-    username = data.username
-    password = data.password
-    account_data = await db.accounts.find_one({"username": username})
+    account_data = await db.accounts.find_one({"username": data.username})
     if not account_data:
         raise HTTPException(status_code=401, detail="Invalid username or password")
     
     account = Account(**account_data)
 
-    if not verify_password(password, account.hashed_password):
+    if not verify_password(data.password, account.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid password")
     
     access_token = create_access_token(
-        data={"sub": account.username, "role": account.role},
+        data={"sub": account.username, "role": account.role, "student_id": account.student_id},
         expires_delta=timedelta(minutes=30)
     )
 
@@ -70,5 +68,5 @@ async def register(data: RegisterRequest):
     return {"message": "Account created successfully"}
 
 
-app.include_router(user.router, prefix="/user", tags=["User"], dependencies=[Depends(lambda: require_role("USER"))])
-app.include_router(admin.router, prefix="/admin", tags=["Admin"], dependencies=[Depends(lambda: require_role("ADMIN"))])
+app.include_router(user.router, prefix="/user", tags=["User"], dependencies=[Depends(require_role("USER"))])
+app.include_router(admin.router, prefix="/admin", tags=["Admin"], dependencies=[Depends(require_role("ADMIN"))])

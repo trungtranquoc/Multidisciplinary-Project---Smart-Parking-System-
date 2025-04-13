@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from db import db
 from typing import Optional
 from datetime import date
+from models.student import Student
 
 router = APIRouter()
 
@@ -57,3 +58,11 @@ async def toggle_device_system():
         "isSuccess": False,
         "message": None
     }
+
+@router.post("/add_student")
+async def add_student(student: Student):
+    exist_student = await db.students.find_one({"student_id": student.student_id})
+    if exist_student:
+        raise HTTPException(status_code=400, detail="Student exists")
+    await db.students.insert_one(student.model_dump())
+    return {"message": "Student created successfully"}
