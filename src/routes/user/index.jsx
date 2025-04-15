@@ -3,7 +3,7 @@ import Sidebar from "../../components/Sidebar"
 import { Suspense, lazy } from "react"
 
 const PersonalInformationPage = lazy(() => import("../../pages/PersonalInformation"))
-const DashooardPage = lazy(() => import("../../pages/DashboardPage"))
+const DashboardPage = lazy(() => import("../../pages/DashboardPage"))
 const ParkingHistoryPage = lazy(() => import("../../pages/ParkingHistoryPage"))
 
 const UserRoute = () => {
@@ -15,7 +15,7 @@ const UserRoute = () => {
                     path="dashboard"
                     element={
                         <Suspense>
-                            <DashooardPage />
+                            <DashboardPage />
                         </Suspense>
                     }
                 />
