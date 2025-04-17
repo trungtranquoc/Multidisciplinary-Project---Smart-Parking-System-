@@ -35,7 +35,21 @@ export const venlitationDeivceStatus = [
     { name: "Ven B-1", id: "VB-1", status: false}, 
     { name: "Ven B-2", id: "VB-2", status: true}, 
     { name: "Ven C-1", id: "VC-1", status: false},  
-    { name: "Ven C-2", id: "VC-2", status: false}, 
+    { name: "Ven C-2", id: "VC-2", status: false},
+]
+
+export const parkingHistory = [
+    { date: "07-04-2025", day_in_week: "Mon", bike: "SA - 59B.10125", enter: "14:10", exit: "16:05", parking_lot: "Entrance 3 - To Hien Thanh Parking Lot", responsible: "Tran Quoc B" },
+    { date: "07-04-2025", day_in_week: "Mon", bike: "SA - 59B.10125", enter: "14:10", exit: "16:05", parking_lot: "Entrance 3 - To Hien Thanh Parking Lot", responsible: "Tran Quoc B" },
+    { date: "07-04-2025", day_in_week: "Mon", bike: "SA - 59B.10125", enter: "14:10", exit: "16:05", parking_lot: "Entrance 3 - To Hien Thanh Parking Lot", responsible: "Tran Quoc B" },
+    { date: "07-04-2025", day_in_week: "Mon", bike: "SA - 59B.10125", enter: "14:10", exit: "16:05", parking_lot: "Entrance 3 - To Hien Thanh Parking Lot", responsible: "Tran Quoc B" },
+    { date: "07-04-2025", day_in_week: "Mon", bike: "SA - 59B.10125", enter: "14:10", exit: "16:05", parking_lot: "Entrance 3 - To Hien Thanh Parking Lot", responsible: "Tran Quoc B" },
+    { date: "07-04-2025", day_in_week: "Mon", bike: "SA - 59B.10125", enter: "14:10", exit: "16:05", parking_lot: "Entrance 3 - To Hien Thanh Parking Lot", responsible: "Tran Quoc B" },
+    { date: "07-04-2025", day_in_week: "Mon", bike: "SA - 59B.10125", enter: "14:10", exit: "16:05", parking_lot: "Entrance 3 - To Hien Thanh Parking Lot", responsible: "Tran Quoc B" },
+    { date: "07-04-2025", day_in_week: "Mon", bike: "SA - 59B.10125", enter: "14:10", exit: "16:05", parking_lot: "Entrance 3 - To Hien Thanh Parking Lot", responsible: "Tran Quoc B" },
+    { date: "07-04-2025", day_in_week: "Mon", bike: "SA - 59B.10125", enter: "14:10", exit: "16:05", parking_lot: "Entrance 3 - To Hien Thanh Parking Lot", responsible: "Tran Quoc B" },
+    { date: "07-04-2025", day_in_week: "Mon", bike: "SA - 59B.10125", enter: "14:10", exit: "16:05", parking_lot: "Entrance 3 - To Hien Thanh Parking Lot", responsible: "Tran Quoc B" },
+    { date: "07-04-2025", day_in_week: "Mon", bike: "SA - 59B.10125", enter: "14:10", exit: "16:05", parking_lot: "Entrance 3 - To Hien Thanh Parking Lot", responsible: "Tran Quoc B" },
 ]
 
 // export {samplePrintedFiles, sampleWaitingFiles, sampleAllowedFormats}
