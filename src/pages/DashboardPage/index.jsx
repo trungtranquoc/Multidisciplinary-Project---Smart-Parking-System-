@@ -5,7 +5,7 @@ import SlotProgress from "../../components/PieChartStatus";
 import { Bike, MapPin, Clock, Hourglass } from 'lucide-react';
 import ParkingHistoryChart from "../../components/ParkingHistoryChart";
 import ParkingLotStatus from "../../components/ParkingLotStatus";
-const DashooardPage = () => {
+const DashboardPage = () => {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -112,4 +112,4 @@ const DashooardPage = () => {
   );
 };
 
-export default DashooardPage;
+export default DashboardPage;
