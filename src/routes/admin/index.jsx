@@ -7,7 +7,6 @@ const DashboardPage = lazy(() => import("../../pages/admin/DashboardPage"))
 const MonitoringPage = lazy(() => import("../../pages/admin/MonitoringPage"))
 const ParkingHistoryPage = lazy(() => import("../../pages/admin/ParkingHistoryPage"))
 const Statistic = lazy(() => import("../../pages/admin/ParkingStatistic"))
-const ParkingData = lazy(() => import("../../pages/admin/ParkingData"))
 const AdminRoute = () => {
     return (
         <div className="flex h-full">
@@ -53,15 +52,6 @@ const AdminRoute = () => {
                     element={
                         <Suspense>
                             <Statistic />
-                        </Suspense>
-                    }
-                />
-
-                <Route 
-                    path="parking_data"
-                    element={
-                        <Suspense>
-                            <ParkingData />
                         </Suspense>
                     }
                 />
