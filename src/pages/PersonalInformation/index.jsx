@@ -66,6 +66,7 @@ const PersonalInformationPage = () => {
   return (
     <div className="flex flex-col space-y-8 bg-gray-100 p-6 w-full overflow-y-auto max-h-screen h-screen">
       <Header pageName="Personal Information" description="This is your main page."/>
+      
       <div className="flex flex-row space-x-8 w-full">
         <div className="flex flex-col space-y-8 w-[42%]">
           <div className="flex flex-col space-y-3 p-5 w-full items-center bg-white rounded-lg drop-shadow">
