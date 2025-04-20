@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
+
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -30,10 +31,13 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-export default function ParkingHistoryChart({data}) {
+const ParkingHistoryChart = ({data}) => {
   const dataStartDate = dayjs('2025-03-31');
   const today = dayjs();
+  const chartHeight = 500;
 
+
+  // Fetch the current week and show previous week info
   const getWeekStart = (date) => {
     const day = date.day();
     const diff = day === 0 ? 6 : day - 1;
@@ -48,11 +52,10 @@ export default function ParkingHistoryChart({data}) {
     const start = getWeekStart(dataStartDate).add(weekOffset, 'week');
     return { start, end: start.add(6, 'day').endOf('day') };
   };
-
   const { start, end } = getWeekRange();
-
   const displayedDays = daysOfWeek.map((_, index) => start.add(index, 'day').format('YYYY-MM-DD'));
 
+  // Convert data
   const barChartData = displayedDays.flatMap((date, index) => {
     const entriesForDay = data.filter((d) => d.day === date);
     return entriesForDay.map((entry) => ({
@@ -63,15 +66,33 @@ export default function ParkingHistoryChart({data}) {
       startValue: entry.start,
     }));
   });
+
+  // Adjust bar height and bar top dynamically
+  const chartRef = useRef(null);
+  const [yAxisInfo, setYAxisInfo] = useState({ top: 0, height: 0 });
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      if (chartRef.current) {
+        const yAxisLine = chartRef.current.querySelector('.recharts-cartesian-axis-line');
+        if (yAxisLine) {
+          const y1 = parseFloat(yAxisLine.getAttribute('y1'));
+          const y2 = parseFloat(yAxisLine.getAttribute('y2'));
+          const height = y2 - y1;
+          setYAxisInfo({ top: y1, height });
+        }
+      }
+    });
+  }, []);
   
 
   return (
-    <>
-      <ResponsiveContainer width="100%" height={300}>
+    <div ref={chartRef} style={{ width: '100%', height: chartHeight }}>
+      <ResponsiveContainer width="100%" height="100%">
         <ComposedChart
           layout="horizontal" 
           data={barChartData}
-          margin={{ top: 10, right: 30, bottom: 30, left: 20 }}
+          margin={{ top: 10, right: 30, bottom: 10, left: 20 }}
         >
           <CartesianGrid strokeDasharray="3 3" vertical={false} /> 
           <XAxis
@@ -82,40 +103,43 @@ export default function ParkingHistoryChart({data}) {
           />
           <YAxis
             type="number" 
-            domain={[6, 22]}
-            ticks={[6, 8, 10, 12, 14, 16, 18, 20, 22]}
-            tickFormatter={(tick) =>
-                tick < 12 ? `${tick} AM` : tick === 12 ? '12 PM' : `${tick - 12} PM`
-            }
+            domain={[22, 6]}
+            ticks={[22, 20, 18, 16, 14, 12, 10, 8, 6]}  // Reverse the domain for upward grow bar
+            // tickFormatter={(tick) =>
+            //     tick < 12 ? `${tick} AM` : tick === 12 ? '12 PM' : `${tick - 12} PM`
+            // }
             tick={{ fontSize: 12 }}
-            interval={1}
+            interval={0}
+            className='recharts-cartesian-axis'
           />
           <Tooltip content={<CustomTooltip />} />
           <Bar
-            dataKey="duration"
+            dataKey= {(entry) => entry.end - entry.start} 
             barSize={10}
             radius={[5, 5, 5, 5]}
             fill="#555"
             isAnimationActive={false}
-            shape={({ x, width, payload, yAxis }) => {
-              const scaleY = yAxis?.scale;
-              const yStart = scaleY(payload.startTime);
-              const yEnd = scaleY(payload.endTime);
+            shape={({ x, width, payload }) => {
+              const minHour = 6;
+              const maxHour = 22;
+              const unitHeight = yAxisInfo.height / (maxHour - minHour);
             
-              const barHeight = yEnd - yStart;
+              const y = yAxisInfo.top + (maxHour - payload.endTime) * unitHeight;
+            
+              const height = payload.duration * unitHeight;
             
               return (
                 <rect
                   x={x}
-                  y={yStart}
+                  y={y}
                   width={width}
-                  height={barHeight}
+                  height={height}
                   rx={4}
                   ry={4}
                   fill="#555"
                 />
               );
-            }}            
+            }}
           />
 
 
@@ -140,6 +164,8 @@ export default function ParkingHistoryChart({data}) {
           &gt;
         </button>
       </div>
-    </>
+    </div>
   );
 }
+
+export default ParkingHistoryChart;
