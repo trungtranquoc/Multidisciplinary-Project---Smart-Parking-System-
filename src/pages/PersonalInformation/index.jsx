@@ -7,8 +7,7 @@ import { ReactComponent as BookSvg } from "../../assets/svgs/book.svg";
 import { ReactComponent as HistorySvg } from "../../assets/svgs/query_builder.svg";
 import { ReactComponent as BikeSvg } from "../../assets/svgs/motorcycle.svg";
 import { ReactComponent as HourglassSvg } from "../../assets/svgs/hourglass_empty.svg";
-
-// import UserService from "../../API/user";
+import UserService from "../../API/user";
 
 const PersonalInformationPage = () => {
   const [isLoading, setIsLoading] = useState(true)
@@ -21,31 +20,19 @@ const PersonalInformationPage = () => {
       setIsLoading(true);
 
       // Fetch data here
-      // await UserService.getPersonalInformation()
-      // .then((res) => {
-      //   const fetchPersonalInfo = res.data;
+      await UserService.getPersonalInformation()
+      .then((res) => {
+        const fetchPersonalInfo = res.data;
 
-      //   console.log(res)
+        console.log(res)
 
-      //   setPersonalInfo(fetchPersonalInfo);
-      // }).catch((err) => {
-      //   console.error(err);
-      //   setPersonalInfo(defaultPersonalData);
-      // })
+        setPersonalInfo(fetchPersonalInfo);
+      }).catch((err) => {
+        setPersonalInfo(defaultPersonalData);
+        alert("Connect to Backend fail: " + err)
+      })
 
-      // await UserService.getPrintingHistory()
-      // .then((res) => {
-      //   const fetchPrintingHistory = res.data;
-      //   setPrintingHistory(fetchPrintingHistory)
-      // }).catch((err) => {
-      //   console.error(err);
-      //   setPrintingHistory(samplePrintedFiles);
-      //   alert("Connect to Backend fail ! Use default mode instead !")
-      // })
-      
-      setPersonalInfo(defaultPersonalData);
       setStudentStatistic(defaultStudentStatistic);
-
       const studentId = localStorage.getItem('studentId');
       setStudentId(studentId);
       setIsLoading(false);
@@ -102,14 +89,14 @@ const PersonalInformationPage = () => {
             <div className="flex flex-col w-full justify-start space-y-2">
               <p className="text-xl font-bold text-black">Motorbike Registration Certificate</p>
               <text className="bg-gray rounded-lg text-gray-dark font-normal px-3 py-[10px] w-full justify-start text-base">
-                {personalInfo.bike_certificate}
+                {personalInfo.bike_certificate || "No bike certificate"}
               </text>
             </div>
             
             <div className="flex flex-col w-full justify-start space-y-2">
               <p className="text-xl font-bold text-black">Registered Bike</p>
               <text className="bg-gray rounded-lg text-gray-dark font-normal px-3 py-[10px] w-full justify-start text-base">
-                {personalInfo.register_bike}
+              {personalInfo.register_bike || "No registered bike"}
               </text>
             </div>
             
