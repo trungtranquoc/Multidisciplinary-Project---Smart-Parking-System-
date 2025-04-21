@@ -7,8 +7,8 @@ import { ReactComponent as BookSvg } from "../../assets/svgs/book.svg";
 import { ReactComponent as HistorySvg } from "../../assets/svgs/query_builder.svg";
 import { ReactComponent as BikeSvg } from "../../assets/svgs/motorcycle.svg";
 import { ReactComponent as HourglassSvg } from "../../assets/svgs/hourglass_empty.svg";
-
-// import UserService from "../../API/user";
+import UserService from "../../API/user";
+import { formatDate, formatDateTime } from "../../utils/functions";
 
 const PersonalInformationPage = () => {
   const [isLoading, setIsLoading] = useState(true)
@@ -21,31 +21,19 @@ const PersonalInformationPage = () => {
       setIsLoading(true);
 
       // Fetch data here
-      // await UserService.getPersonalInformation()
-      // .then((res) => {
-      //   const fetchPersonalInfo = res.data;
+      await UserService.getPersonalInformation()
+      .then((res) => {
+        const fetchPersonalInfo = res.data;
 
-      //   console.log(res)
+        console.log(res)
 
-      //   setPersonalInfo(fetchPersonalInfo);
-      // }).catch((err) => {
-      //   console.error(err);
-      //   setPersonalInfo(defaultPersonalData);
-      // })
+        setPersonalInfo(fetchPersonalInfo);
+      }).catch((err) => {
+        setPersonalInfo(defaultPersonalData);
+        alert("Connect to Backend fail: " + err)
+      })
 
-      // await UserService.getPrintingHistory()
-      // .then((res) => {
-      //   const fetchPrintingHistory = res.data;
-      //   setPrintingHistory(fetchPrintingHistory)
-      // }).catch((err) => {
-      //   console.error(err);
-      //   setPrintingHistory(samplePrintedFiles);
-      //   alert("Connect to Backend fail ! Use default mode instead !")
-      // })
-      
-      setPersonalInfo(defaultPersonalData);
       setStudentStatistic(defaultStudentStatistic);
-
       const studentId = localStorage.getItem('studentId');
       setStudentId(studentId);
       setIsLoading(false);
@@ -102,21 +90,21 @@ const PersonalInformationPage = () => {
             <div className="flex flex-col w-full justify-start space-y-2">
               <p className="text-xl font-bold text-black">Motorbike Registration Certificate</p>
               <text className="bg-gray rounded-lg text-gray-dark font-normal px-3 py-[10px] w-full justify-start text-base">
-                {personalInfo.bike_certificate}
+                {personalInfo.bike_certificate || "No bike certificate"}
               </text>
             </div>
             
             <div className="flex flex-col w-full justify-start space-y-2">
               <p className="text-xl font-bold text-black">Registered Bike</p>
               <text className="bg-gray rounded-lg text-gray-dark font-normal px-3 py-[10px] w-full justify-start text-base">
-                {personalInfo.register_bike}
+              {personalInfo.register_bike || "No registered bike"}
               </text>
             </div>
             
             <div className="flex flex-col w-full justify-start space-y-2">
               <p className="text-xl font-bold text-black">Account Due</p>
               <text className="bg-gray rounded-lg text-gray-dark font-normal px-3 py-[10px] w-full justify-start text-base">
-                {personalInfo.account_due}
+                {formatDate(personalInfo.account_due)}
               </text>
             </div>
           </div>
@@ -151,7 +139,7 @@ const PersonalInformationPage = () => {
           <div className="flex flex-row justify-between items-center p-6 w-full bg-white rounded-lg drop-shadow" >
             <div className="flex flex-col space-y-[6px] items-start">
               <p className="text-xl font-bold text-blue">Last parking</p>
-              <p className="text-3xl font-bold text-black">{personalInfo.last_parking}</p>
+              <p className="text-3xl font-bold text-black">{formatDateTime(personalInfo.last_parking)}</p>
             </div>
             <HourglassSvg className="w-20 h-20" fill="#0388B4" />
           </div>

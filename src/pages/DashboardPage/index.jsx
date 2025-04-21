@@ -5,14 +5,38 @@ import SlotProgress from "../../components/PieChartStatus";
 import { Bike, MapPin, Clock, Hourglass } from 'lucide-react';
 import ParkingHistoryChart from "../../components/ParkingHistoryChart";
 import ParkingLotStatus from "../../components/ParkingLotStatus";
+import UserService from "../../API/user";
+import { hardParkingStatus, hardCurrentParking } from "../../hardData";
+import { formatDateTime, formatHour } from "../../utils/functions";
+
 const DashboardPage = () => {
   const [isLoading, setIsLoading] = useState(true)
+  const [parkingStatus, setParkingStatus] = useState(null)
+  const [currentParking, setCurrentParking] = useState(null)
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       
-      setIsLoading(false);
+      await UserService.getParkingStatus().then((res) => {
+        const fetchParkingStatus = res.data;
+        console.log(res)
+        setParkingStatus(fetchParkingStatus);
+      }).catch((err) => {
+        setParkingStatus(hardParkingStatus);
+        alert("Connect to Backend fail: " + err)
+      })
+
+      await UserService.getCurrentParking().then((res) => {
+        const fetchCurrentParking = res.data;
+        setCurrentParking(fetchCurrentParking);
+        console.log(res)
+      }).catch((err) => {
+        setCurrentParking(hardCurrentParking);
+        alert("Connect to Backend fail: " + err)
+      }).finally(() => {
+        setIsLoading(false);
+      })
     }
 
     fetchData();
@@ -34,7 +58,7 @@ const DashboardPage = () => {
         <div className="status-left-bar w-full">
           <div className="max-w-md mx-auto mt-2 mb-2 p-6 bg-white space-y-2">
             <h1 className="text-2xl font-bold text-black mb-4">Parking Lot Status</h1>
-            <ParkingLotStatus />
+            <ParkingLotStatus temperature={parkingStatus.temperature} closing={formatHour(parkingStatus.closing)} opening={formatHour(parkingStatus.opening)} />
           </div>
           <div className="max-w-md mx-auto mt-2 mb-2 p-6 rounded-2xl shadow-md border border-gray-200 bg-white space-y-6">
             <div className="flex justify-between items-center mb-4">
@@ -52,7 +76,7 @@ const DashboardPage = () => {
             <h1 className="text-2xl font-bold text-black mb-4">Available slots</h1>
 
             <div className="flex items-center justify-center mb-6">
-              <SlotProgress total={1000} available={700} />
+              <SlotProgress total={parkingStatus.maximum_slot} available={parkingStatus.available_slot} />
             </div>
 
             <div className="flex justify-around text-sm">
@@ -73,21 +97,21 @@ const DashboardPage = () => {
 
             <div className="flex flex-col items-center">
               <Bike className="w-16 h-16 text-green-500" />
-              <p className="mt-2 text-lg font-semibold text-green-600">Currently Parking</p>
+              <p className={`mt-2 text-lg font-semibold ${currentParking.is_parking ? 'text-green-600' : 'text-gray-700'}`}>{currentParking.is_parking ? "Currently Parking" : "Not Parking"}</p>
             </div>
 
             <div className="space-y-4 text-sm text-gray-800">
               <div className="flex items-center space-x-2">
                 <Bike className="w-5 h-5 text-gray-600" />
                 <span className="font-semibold">License:</span>
-                <span>SA - 59B.10125</span>
+                <span>{currentParking.is_parking ? currentParking.bike : ''}</span>
               </div>
               
               <div className="flex items-center space-x-2">
                 <MapPin className="w-5 h-5 text-gray-600" />
                 <p className="text-sm">
                   <span className="font-semibold">Parking:</span>{' '}
-                  <span className="font-normal">Entrance 3 - To Hien Thanh Parking Lot</span>
+                  <span className="font-normal">{currentParking.is_parking ? currentParking.parking_lot : ''}</span>
                 </p>
               </div>
 
@@ -95,13 +119,13 @@ const DashboardPage = () => {
               <div className="flex items-center space-x-2">
                 <Clock className="w-5 h-5 text-gray-600" />
                 <span className="font-semibold">Enter:</span>
-                <span>07:11:36 AM - 07/04/2025</span>
+                <span>{currentParking.is_parking ? formatDateTime(currentParking.enter) : ''}</span>
               </div>
 
               <div className="flex items-center space-x-2">
                 <Hourglass className="w-5 h-5 text-gray-600" />
                 <span className="font-semibold">Closing at:</span>
-                <span>21:00 PM</span>
+                <span>{currentParking.is_parking ? formatHour(parkingStatus.closing) : ''}</span>
               </div>
             </div>
           </div>

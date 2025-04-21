@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/en'; // Or your preferred locale
 
-const ParkingLotStatus = () => {
+const ParkingLotStatus = ({ temperature, closing, opening }) => {
   const [timeOfDay, setTimeOfDay] = useState('');
   const [formattedDate, setFormattedDate] = useState('');
   const [status, setStatus] = useState('Open');
@@ -55,7 +55,7 @@ const ParkingLotStatus = () => {
             <div className="absolute top-0 right-0 bg-yellow-400 rounded-full w-8 h-8"></div>
           </div>
           <div className="ml-3">
-            <span className="text-2xl font-bold">30°</span> {/* Static Temperature */}
+            <span className="text-2xl font-bold">{temperature}°</span> {/* Static Temperature */}
             <p className="text-sm text-gray-600">Sunny</p> {/* Static Weather */}
           </div>
         </div>
@@ -88,7 +88,7 @@ const ParkingLotStatus = () => {
             {status}
           </p>
         </div>
-        <p className="text-sm text-gray-700">Closing: 21:00 pm</p>
+        <p className="text-sm text-gray-700">{status === 'Closed' ? "Opening: " + opening : "Closing: " + closing}</p>
       </div>
     </div>
   );
