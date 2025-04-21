@@ -145,24 +145,10 @@ const ParkingHistoryChart = ({data}) => {
 
         </ComposedChart>
       </ResponsiveContainer>
-
-      <div className="mt-4 flex justify-between items-center text-sm text-gray-600">
-        <button
-          onClick={() => setWeekOffset((prev) => prev - 1)}
-          className="px-2 py-1 hover:bg-gray-100 rounded"
-          disabled={start.isBefore(getWeekStart(dataStartDate))}
-        >
-          &lt;
-        </button>
+      <div className="mt-4 flex justify-center items-center text-sm text-gray-600">
         <span className="font-medium">
           Week {start.format('DD/MM/YYYY')} - {end.format('DD/MM/YYYY')}
         </span>
-        <button
-          onClick={() => setWeekOffset((prev) => prev + 1)}
-          className="px-2 py-1 hover:bg-gray-100 rounded"
-        >
-          &gt;
-        </button>
       </div>
     </div>
   );
