@@ -32,12 +32,17 @@ const CustomTooltip = ({ active, payload, label }) => {
 const ParkingHistoryChart = ({data}) => {
   const chartHeight = 500;
 
+  const preparedData = data.map((e, i) => ({
+    ...e,
+    day: daysOfWeek[i],
+  }));
+  
+
+
   // Convert data
-  const barChartData = data.map((entry) => {
-    const date = new Date(entry.day);
-    const dayName = daysOfWeek[date.getDay() === 0 ? 6 : date.getDay() - 1]; // Adjust Sunday (0) to be last
+  const barChartData = preparedData.map((entry) => {
     return {
-      day: dayName,
+      day: entry.day,
       startTime: entry.start,
       endTime: entry.end,
       duration: entry.end - entry.start,
