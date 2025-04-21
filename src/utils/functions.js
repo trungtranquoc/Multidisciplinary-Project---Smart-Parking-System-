@@ -17,7 +17,7 @@ export function formatDateTime(date_str) {
     hours = hours ? hours : 12; // the hour '0' should be '12'
     
     // Get the day, month, and year
-    const day = date.getDate();
+    let day = date.getDate();
     const month = date.getMonth() + 1; // months are zero-based
     const year = date.getFullYear();
 
@@ -45,17 +45,45 @@ export function formatHour(date_str) {
     // Convert to 24-hour format for the time part
     hours = hours % 12;
     hours = hours ? hours : 12; // the hour '0' should be '12'
+
+    // Format the date and time string
+    const timeString = `${hours}:${minutes}${ampm}`;
+
+    return `${timeString}`;
+}
+
+export function formatHour2(date_str) {
+    // console.log(typeof(str))
+    const date = new Date(date_str);
+
+    // Get the hours and minutes
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
     
+    // Format minutes to always be 2 digits
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+
+    // Convert to 24-hour format for the time part
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+
+    // Format the date and time string
+    const timeString = `${hours}:${minutes}`;
+
+    return `${timeString}`;
+}
+
+export function formatDate(date_str) {          // DD/MM/YYYY
+    // console.log(typeof(str))
+    const date = new Date(date_str);
+
     // Get the day, month, and year
     const day = date.getDate();
     const month = date.getMonth() + 1; // months are zero-based
     const year = date.getFullYear();
 
-    // Format the date and time string
-    const timeString = `${hours}:${minutes}${ampm}`;
-    const dateString = `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
-
-    return `${timeString} ${dateString}`;
+    // Format the date string
+    return `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
 }
 
 export function deltaTime(t1, t2) {
@@ -75,4 +103,14 @@ export function deltaTime(t1, t2) {
     const date2 = parseCustomDateTime(t2);
 
     return (date2 - date1) / (1000 * 60);
+}
+
+export function formatDayOfWeek(date_str) {
+    const date = new Date(date_str);
+    const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
+    const day = date.getDate();
+    const monthName = date.toLocaleDateString('en-US', { month: 'long' });
+    const year = date.getFullYear();
+
+    return `${weekday}, ${monthName} ${day} ${year}`;
 }

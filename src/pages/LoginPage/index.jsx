@@ -7,7 +7,7 @@ const LoginPage = () => {
     const navigate = useNavigate()
 
     const studentLogin = () => {
-        localStorage.setItem('studentId', '101')
+        localStorage.setItem('studentId', '123')
 
         navigate('/user/student_information')   
     }
