@@ -1,27 +1,47 @@
 import React, { useEffect, useState } from "react";
 import Header from "../../components/Header";
-import { defaultPersonalData, samplePrintedFiles, parkingHistory } from "../../hardData";
+import { hardParkingHistory } from "../../hardData";
 import ParkingHistoryItem from "../../components/ParkingHistoryItem";
 import PageTransitionBar from "../../components/PageTransitionBar";
-// import UserService from "../../API/user";
+import UserService from "../../API/user";
+
+const perPage = 12;
 
 const ParkingHistoryPage = () => {
   const [isLoading, setIsLoading] = useState(true)
-  const [parkings, setParkings] = useState([])
+  const [showParkings, setShowParkings] = useState([])
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
+  const [parkingHistory, setParkingHistory] = useState([])
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       
+      await UserService.getParkingHistory()
+      .then((res) => {
+        const fetchParkingHistory = res.data;
+        console.log(res)
+        setParkingHistory(fetchParkingHistory);
+        setMaxPage(Math.ceil(fetchParkingHistory.length / perPage));
+      }).catch((err) => {
+        setParkingHistory(hardParkingHistory);
+        setMaxPage(Math.ceil(hardParkingHistory.length / perPage));
+        
+        alert("Connect to Backend fail: " + err)
+      })
+      setPage(1);
       setIsLoading(false);
     }
 
-    setMaxPage(5);
-    setParkings(parkingHistory);
     fetchData();
   }, [])
+
+  useEffect(() => {
+    const start = (page - 1) * perPage;
+    const end = start + perPage > parkingHistory.length ? parkingHistory.length : start + perPage;
+    setShowParkings(parkingHistory.slice(start, end));
+  }, [page, parkingHistory])
 
   // Loading page
   if (isLoading) {
@@ -39,16 +59,16 @@ const ParkingHistoryPage = () => {
       <div className="w-full flex flex-col items-start p-5 bg-white rounded-lg drop-shadow space-y-2">
         <p className="text-2xl font-bold text-black mb-3">Parking History</p>
         <div className="w-full flex flex-row">
-          <p className="w-[13%] flex items-start text-gray-dark font-medium text-lg">Date</p>
+          <p className="w-[16%] flex items-start text-gray-dark font-medium text-lg">Date</p>
           <p className="w-[13%] flex items-start text-gray-dark font-medium text-lg">Motorbike</p>
           <p className="w-[12%] flex items-start text-gray-dark font-medium text-lg">Enter time</p>
           <p className="w-[12%] flex items-start text-gray-dark font-medium text-lg">Exit time</p>
-          <p className="w-[27%] flex items-start text-gray-dark font-medium text-lg">Parking lot</p>
+          <p className="w-[24%] flex items-start text-gray-dark font-medium text-lg">Parking lot</p>
           <p className="w-[23%] flex items-start text-gray-dark font-medium text-lg">Responsible staff</p>
         </div>
         <div className="w-full h-[1px] bg-gray-dark"/>
         <div className="w-full space-y-3 flex flex-col">
-          {parkings.map((item) =>
+          {showParkings.map((item) =>
             (
               <ParkingHistoryItem {...item} />
             ))

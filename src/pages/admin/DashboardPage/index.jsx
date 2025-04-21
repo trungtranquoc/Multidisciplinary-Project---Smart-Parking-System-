@@ -1,39 +1,52 @@
 import React, { useEffect, useState } from "react";
 import Header from "../../../components/Header";
 import LogChart from "../../../components/LogChart";
+import AdminService from "../../../API/admin";
+import { hardTemperatureData, hardHumidityData, hardParkingStatus } from "../../../hardData";
+import { formatDayOfWeek, formatHour2 } from "../../../utils/functions";
 
+const processingTemperatureData = (data) => {
+  return {
+    time: formatHour2(data.record_time),
+    value: data.temperature,
+  }
+}
+
+const procecssingHumidityData = (data) => {
+  return {
+    time: formatHour2(data.record_time),
+    value: Math.round(data.humidity * 100),
+  }
+}
 
 const DashboardPage = () => {
   const [isLoading, setIsLoading] = useState(true);
-
-  const temperatureData = [
-    { time: '14:20', value: 30 },
-    { time: '14:40', value: 32 },
-    { time: '15:00', value: 33 },
-    { time: '15:20', value: 34 },
-    { time: '15:40', value: 33 },
-    { time: '16:00', value: 31 },
-    { time: '16:20', value: 29 },
-    { time: '16:40', value: 29 },
-    { time: '17:00', value: 28 },
-  ];
-
-  const humidityData = [
-    { time: '14:20', value: 70 },
-    { time: '14:40', value: 62 },
-    { time: '15:00', value: 60 },
-    { time: '15:20', value: 70 },
-    { time: '15:40', value: 72 },
-    { time: '16:00', value: 62 },
-    { time: '16:20', value: 68 },
-    { time: '16:40', value: 66 },
-    { time: '17:00', value: 69 },
-  ];
+  const [lotData, setLotData] = useState(null);
+  const [temperatureData, setTemperatureData] = useState([]);
+  const [humidityData, setHumidityData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-      setIsLoading(false);
+
+      await AdminService.getParkingCondition().then((res) => {
+          console.log("Parking condition: ", res.data);
+
+          setLotData(res.data);
+          setTemperatureData(res.data.temperature_log.slice().reverse().map((item) => processingTemperatureData(item)));
+          setHumidityData(res.data.humidity_log.slice().reverse().map((item) => procecssingHumidityData(item)));
+          // console.log("Temperature data: ", res.data.temperature_log.map((item) => processingTemperatureData(item)));
+          // console.log("Humidity data: ", res.data.humidity_log.slice().reverse().map((item) => procecssingHumidityData(item)));
+        })
+        .catch((err) => {
+          console.log("Error: ", err);
+
+          setLotData(hardParkingStatus);
+          setTemperatureData(hardTemperatureData);
+          setHumidityData(hardHumidityData)
+        }).finally(() => {
+          setIsLoading(false);
+        })
     };
 
     fetchData();
@@ -67,7 +80,7 @@ const DashboardPage = () => {
           {/* Current Shift Card */}
           <div className="flex-1 min-w-[200px] bg-gray-100 rounded-xl shadow p-4 flex flex-col items-center justify-center">
             <p className="text-sm text-gray-500 mb-1">Current Shift</p>
-            <h2 className="text-xl font-semibold">Nguyen Van A</h2>
+            <h2 className="text-xl font-semibold">{lotData.current_shift}</h2>
             <div className="w-20 h-20 rounded-full bg-gray-400 mt-2" />
           </div>
 
@@ -77,11 +90,11 @@ const DashboardPage = () => {
             <div className="flex items-center gap-2 mt-2">
               <span className="text-2xl">🌤️</span>
               <div>
-                <p className="text-2xl font-bold">30°</p>
+                <p className="text-2xl font-bold">{lotData.temperature_log[0].temperature}°</p>
                 <p className="text-sm text-gray-600">Sunny</p>
               </div>
             </div>
-            <p className="text-sm text-gray-600 mt-4">Monday, April 7 2025</p>
+            <p className="text-sm text-gray-600 mt-4">{formatDayOfWeek(new Date())}</p>
           </div>
 
           {/* Humidity Card */}
@@ -89,7 +102,7 @@ const DashboardPage = () => {
             <p className="text-lg font-medium">Humidity</p>
             <div className="flex items-center mt-2">
               <span className="text-3xl">🌡️</span>
-              <p className="text-2xl font-bold ml-2">71%</p>
+              <p className="text-2xl font-bold ml-2">{lotData.humidity_log[0].humidity * 100}%</p>
             </div>
             <button className="text-sm underline mt-4 text-white">Turn on / off the ventilation</button>
           </div>
@@ -113,7 +126,7 @@ const DashboardPage = () => {
       {/* Temperature Log */}
       <div className="bg-white rounded-2xl shadow-md p-6">
         <h2 className="text-xl font-bold mb-4">Temperature Log</h2>
-        <LogChart data={temperatureData} range={[24,38]} />
+        <LogChart data={temperatureData} range={[20,42]} />
         <p className="text-center text-sm mt-2 text-gray-500">
           Temperature log recorded (Unit: °C)
         </p>
@@ -122,9 +135,9 @@ const DashboardPage = () => {
       {/* Humidity Log */}
       <div className="bg-white rounded-2xl shadow-md p-6">
         <h2 className="text-xl font-bold mb-4">Humidity Log</h2>
-        <LogChart data={humidityData} range={[45, 80]}/> 
+        <LogChart data={humidityData} range={[20, 80]}/> 
         <p className="text-center text-sm mt-2 text-gray-500">
-          Humidity log recorded (Unit: °C)
+          Humidity log recorded (Unit: %)
         </p>
       </div>
     </div>

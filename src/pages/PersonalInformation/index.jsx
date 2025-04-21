@@ -8,6 +8,7 @@ import { ReactComponent as HistorySvg } from "../../assets/svgs/query_builder.sv
 import { ReactComponent as BikeSvg } from "../../assets/svgs/motorcycle.svg";
 import { ReactComponent as HourglassSvg } from "../../assets/svgs/hourglass_empty.svg";
 import UserService from "../../API/user";
+import { formatDate, formatDateTime } from "../../utils/functions";
 
 const PersonalInformationPage = () => {
   const [isLoading, setIsLoading] = useState(true)
@@ -103,7 +104,7 @@ const PersonalInformationPage = () => {
             <div className="flex flex-col w-full justify-start space-y-2">
               <p className="text-xl font-bold text-black">Account Due</p>
               <text className="bg-gray rounded-lg text-gray-dark font-normal px-3 py-[10px] w-full justify-start text-base">
-                {personalInfo.account_due}
+                {formatDate(personalInfo.account_due)}
               </text>
             </div>
           </div>
@@ -138,7 +139,7 @@ const PersonalInformationPage = () => {
           <div className="flex flex-row justify-between items-center p-6 w-full bg-white rounded-lg drop-shadow" >
             <div className="flex flex-col space-y-[6px] items-start">
               <p className="text-xl font-bold text-blue">Last parking</p>
-              <p className="text-3xl font-bold text-black">{personalInfo.last_parking}</p>
+              <p className="text-3xl font-bold text-black">{formatDateTime(personalInfo.last_parking)}</p>
             </div>
             <HourglassSvg className="w-20 h-20" fill="#0388B4" />
           </div>

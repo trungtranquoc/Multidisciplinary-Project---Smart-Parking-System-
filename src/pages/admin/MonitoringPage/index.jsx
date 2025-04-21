@@ -5,26 +5,74 @@ import { ReactComponent as LightSvg } from "../../../assets/svgs/highlight.svg";
 import { ReactComponent as VenlitationSvg } from "../../../assets/svgs/camera.svg";
 
 // import { defaultPersonalData, samplePrintedFiles } from "../../hardData";
-// import UserService from "../../API/user";
+import AdminService from "../../../API/admin";
 
 const MonitoringPage = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [lightSystem, setLightSystem] = useState([])
   const [ventilationSystem, setVentilationSystem] = useState([])
+  const [isUsingAPI, setIsUsingAPI] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
+
+      await AdminService.getMonitoringData()
+        .then((res) => {
+          console.log("Monitoring data: ", res.data)
+          setLightSystem(res.data.light_system)
+          setVentilationSystem(res.data.ventilation_system)
+          setIsUsingAPI(true)
+        })
+        .catch((err) => {
+          setLightSystem(lightDeviceStatus);
+          setVentilationSystem(venlitationDeivceStatus);
+
+          alert("Error: ", err)
+        })
     }
 
     fetchData();
 
-    setLightSystem(lightDeviceStatus);
-    setVentilationSystem(venlitationDeivceStatus);
-
     setIsLoading(false);
   }, [])
 
+  const toggleStatus = async (id) => {
+    console.log("Id of device: ", id)
+
+    setIsLoading(true)
+
+    if (isUsingAPI) {
+      await AdminService.toggleMonitoringData(id)
+      .then((res) => {
+        const id = res.data.id
+        const status = res.data.status
+
+        setLightSystem(lightSystem.map((light) => ({
+          name: light.name,
+          status: light.id === id ? status : light.status,
+          id: light.id
+        })))
+      })
+      .catch((err) => {
+        console.log("Error: ", err)
+      }).finally(() => {
+        setIsLoading(false)
+      })
+    } else {
+      const toggleStatus = (status) => {
+        return !status; 
+      }
+
+      setLightSystem(lightSystem.map((light) => ({
+        name: light.name,
+        status: light.id === id ? toggleStatus(light.status) : light.status,
+        id: light.id
+      })))
+      setIsLoading(false)
+    }
+  }
+  
   // Loading page
   if (isLoading) {
     return (
@@ -34,31 +82,6 @@ const MonitoringPage = () => {
     )
   }
 
-  const toggleLightStatus = (id) => {
-    console.log("Id of light: ", id)
-    const toggleStatus = (status) => {
-      return !status; 
-    }
-
-    setLightSystem(lightSystem.map((light) => ({
-      name: light.name,
-      status: light.id === id ? toggleStatus(light.status) : light.status,
-      id: light.id
-    })))
-  }
-
-  const toggleVenlitationStatus = (id) => {
-    console.log("Id of venlitation: ", id)
-    const toggleStatus = (status) => {
-      return !status; 
-    }
-
-    setVentilationSystem(ventilationSystem.map((light) => ({
-      name: light.name,
-      status: light.id === id ? toggleStatus(light.status) : light.status,
-      id: light.id
-    })))
-  }
   return (
     <div className="flex flex-col space-y-8 bg-gray-100 p-6 w-full overflow-y-auto max-h-screen h-screen">
       <Header pageName="Monitoring Page" description="Monitor the system"/>
@@ -99,7 +122,7 @@ const MonitoringPage = () => {
 
                       <div className="flex pl-[77px]">
                         <button
-                          onClick={() => toggleLightStatus(machine.id)}
+                          onClick={() => toggleStatus(machine.id)}
                           className={`w-[92px] h-[32px] text-[14px] font-bold text-white rounded-lg ${machine.status ? "bg-blue" : "bg-[#808080]"}`}
                         >
                           {machine.status ? "Stop" : "Active"}
@@ -147,7 +170,7 @@ const MonitoringPage = () => {
 
                       <div className="flex pl-[77px]">
                         <button
-                          onClick={() => toggleVenlitationStatus(machine.id)}
+                          onClick={() => toggleStatus(machine.id)}
                           className={`w-[92px] h-[32px] text-[14px] font-bold text-white rounded-lg ${machine.status ? "bg-blue" : "bg-[#808080]"}`}
                         >
                           {machine.status ? "Stop" : "Active"}

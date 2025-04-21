@@ -2,37 +2,61 @@ import React, { useEffect, useState } from "react";
 import Header from "../../../components/Header";
 import SlotProgress from "../../../components/PieChartStatus";
 import WorkTimeProgess from "../../../components/WorkingTimeProgress";
+import AdminService from "../../../API/admin";
+import { formatDayOfWeek, formatHour, formatHour2 } from "../../../utils/functions";
+import { hardBikeList, hardParkingStatus } from "../../../hardData";
+import PageTransitionBar from "../../../components/PageTransitionBar";
 
-const dummyData = [
-  { entry: 123, motorbike: "SA - 59B.10125", studentId: "2252859", time: "16:05 PM", lot: "Entrance 3 - To Hien Thanh Parking Lot" },
-  { entry: 101, motorbike: "SA - 59B.10125", studentId: "2252859", time: "16:05 PM", lot: "Entrance 3 - To Hien Thanh Parking Lot" },
-  { entry: 98, motorbike: "SA - 59B.10125", studentId: "2252859", time: "16:05 PM", lot: "Entrance 3 - To Hien Thanh Parking Lot" },
-  { entry: 97, motorbike: "SA - 59B.10125", studentId: "2252859", time: "16:05 PM", lot: "Entrance 3 - To Hien Thanh Parking Lot" },
-  { entry: 95, motorbike: "SA - 59B.10125", studentId: "2252859", time: "16:05 PM", lot: "Entrance 3 - To Hien Thanh Parking Lot" },
-  { entry: 90, motorbike: "SA - 59B.10125", studentId: "2252859", time: "16:05 PM", lot: "Entrance 3 - To Hien Thanh Parking Lot" },
-  { entry: 86, motorbike: "SA - 59B.10125", studentId: "2252859", time: "16:05 PM", lot: "Entrance 3 - To Hien Thanh Parking Lot" },
-  { entry: 80, motorbike: "SA - 59B.10125", studentId: "2252859", time: "16:05 PM", lot: "Entrance 3 - To Hien Thanh Parking Lot" },
-  { entry: 79, motorbike: "SA - 59B.10125", studentId: "2252859", time: "16:05 PM", lot: "Entrance 3 - To Hien Thanh Parking Lot" },
-  { entry: 75, motorbike: "SA - 59B.10125", studentId: "2252859", time: "16:05 PM", lot: "Entrance 3 - To Hien Thanh Parking Lot" },
-];
+const procecssingBikeData = (data) => {
+  return {
+    entry: data["No."],
+    motorbike: data.bike,
+    studentId: data.student_id,
+    time: formatHour2(data.enter),
+    lot: data.parking_lot,
+  };
+}
 
-const PAGE_SIZE = 4;
+const perPage = 10;
 
 const RealTimeManagementPage = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const totalPages = Math.ceil(dummyData.length / PAGE_SIZE);
-  const currentData = dummyData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const [lotData, setLotData] = useState(null);
+  const [bikeList, setBikeList] = useState(hardBikeList);
+  const [page, setPage] = useState(1)
+  const [maxPage, setMaxPage] = useState(1)
+  const [showParkings, setShowParkings] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-      setIsLoading(false);
+
+      await AdminService.getParkingStatus().then((res) => {
+        setLotData(res.data);
+        setBikeList(res.data.list_bike.map((item) => procecssingBikeData(item)));
+        setMaxPage(Math.ceil(res.data.list_bike.length / perPage));
+
+        // console.log("Max page: ", Math.ceil(res.data.list_bike.length / perPage));
+      }).catch((err) => {
+        console.log("Error: ", err);
+
+        setBikeList(hardBikeList);
+        setLotData(hardParkingStatus);
+        setMaxPage(Math.ceil(hardBikeList.length / perPage));
+      }).finally(() => {
+        setIsLoading(false);
+      })
     };
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    console.log("Max Page: ", maxPage)
+    const start = (page - 1) * perPage;
+    const end = start + perPage > bikeList.length ? bikeList.length : start + perPage;
+    setShowParkings(bikeList.slice(start, end));
+  }, [page, maxPage, bikeList])
 
   if (isLoading) {
     return (
@@ -55,10 +79,10 @@ const RealTimeManagementPage = () => {
               </div>
               <div className="flex justify-around text-sm">
                 <div className="flex items-center space-x-2">
-                  <span>Monday, April 7 2025</span>
+                  <span>{formatDayOfWeek(new Date())}</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span>Closing 22:00 pm</span>
+                  <span>Closing: {formatHour(lotData.closing)}</span>
                 </div>
               </div>
             </div>
@@ -66,7 +90,7 @@ const RealTimeManagementPage = () => {
             <div className="flex-1 p-6 rounded-2xl shadow-md border border-gray-200 bg-white space-y-6">
               <h1 className="text-2xl font-bold text-black mb-4">Available slots</h1>
               <div className="flex items-center justify-center mb-6">
-                <SlotProgress total={1000} available={700}/>
+                <SlotProgress total={lotData.maximum_slot} available={lotData.available_slot}/>
               </div>
               <div className="flex justify-around text-sm">
                 <div className="flex items-center space-x-2 text-green-600">
@@ -96,7 +120,7 @@ const RealTimeManagementPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {currentData.map((item, idx) => (
+                {showParkings.map((item, idx) => (
                   <tr key={idx} className="border-b">
                     <td className="p-2">{item.entry}</td>
                     <td className="p-2">{item.motorbike}</td>
@@ -108,17 +132,8 @@ const RealTimeManagementPage = () => {
               </tbody>
             </table>
 
-            <div className="flex justify-center mt-4 space-x-2 text-sm">
-              <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))}>&lt;</button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                <button
-                  key={page}
-                  className={`px-2 py-1 rounded-full ${page === currentPage ? 'bg-gray-300' : ''}`}
-                  onClick={() => setCurrentPage(page)}>
-                  {page}
-                </button>
-              ))}
-              <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}>&gt;</button>
+            <div className="flex justify-center w-full py-2">
+              <PageTransitionBar current={page} setPage={setPage} maxPage={maxPage}/>
             </div>
           </div>
         </div>
