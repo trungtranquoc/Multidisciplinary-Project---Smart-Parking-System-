@@ -9,8 +9,6 @@ import {
   CartesianGrid,
   Bar,
 } from 'recharts';
-import dayjs from 'dayjs';
-import 'dayjs/locale/en';
 
 
 const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -20,8 +18,8 @@ const CustomTooltip = ({ active, payload, label }) => {
     return (
       <div className="bg-white p-2 border border-gray-300 rounded text-xs shadow">
         <p className="font-semibold mb-1">{label}</p>
-        {payload.map((item, index) => (
-          <p key={`tooltip-${index}`}>
+        {payload.map((item) => (
+          <p key={`${item.payload.day}-${item.payload.startTime}`}>
             {item.payload.startTime}:00 - {item.payload.endTime}:00
           </p>
         ))}
@@ -32,39 +30,19 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 const ParkingHistoryChart = ({data}) => {
-  const dataStartDate = dayjs('2025-03-31');
-  const today = dayjs();
   const chartHeight = 500;
 
-
-  // Fetch the current week and show previous week info
-  const getWeekStart = (date) => {
-    const day = date.day();
-    const diff = day === 0 ? 6 : day - 1;
-    return date.subtract(diff, 'day').startOf('day');
-  };
-
-  const lastWeekStartToday = getWeekStart(today).subtract(1, 'week');
-  const initialWeekOffset = lastWeekStartToday.diff(getWeekStart(dataStartDate), 'week');
-  const [weekOffset, setWeekOffset] = useState(initialWeekOffset);
-
-  const getWeekRange = () => {
-    const start = getWeekStart(dataStartDate).add(weekOffset, 'week');
-    return { start, end: start.add(6, 'day').endOf('day') };
-  };
-  const { start, end } = getWeekRange();
-  const displayedDays = daysOfWeek.map((_, index) => start.add(index, 'day').format('YYYY-MM-DD'));
-
   // Convert data
-  const barChartData = displayedDays.flatMap((date, index) => {
-    const entriesForDay = data.filter((d) => d.day === date);
-    return entriesForDay.map((entry) => ({
-      day: daysOfWeek[index],
+  const barChartData = data.map((entry) => {
+    const date = new Date(entry.day);
+    const dayName = daysOfWeek[date.getDay() === 0 ? 6 : date.getDay() - 1]; // Adjust Sunday (0) to be last
+    return {
+      day: dayName,
       startTime: entry.start,
       endTime: entry.end,
       duration: entry.end - entry.start,
       startValue: entry.start,
-    }));
+    };
   });
 
   // Adjust bar height and bar top dynamically
@@ -105,9 +83,9 @@ const ParkingHistoryChart = ({data}) => {
             type="number" 
             domain={[22, 6]}
             ticks={[22, 20, 18, 16, 14, 12, 10, 8, 6]}  // Reverse the domain for upward grow bar
-            // tickFormatter={(tick) =>
-            //     tick < 12 ? `${tick} AM` : tick === 12 ? '12 PM' : `${tick - 12} PM`
-            // }
+            tickFormatter={(tick) =>
+                tick < 12 ? `${tick} AM` : tick === 12 ? '12 PM' : `${tick - 12} PM`
+            }
             tick={{ fontSize: 12 }}
             interval={0}
             className='recharts-cartesian-axis'
@@ -147,7 +125,7 @@ const ParkingHistoryChart = ({data}) => {
       </ResponsiveContainer>
       <div className="mt-4 flex justify-center items-center text-sm text-gray-600">
         <span className="font-medium">
-          Week {start.format('DD/MM/YYYY')} - {end.format('DD/MM/YYYY')}
+          Week 14/04/2025 - 20/04/2025
         </span>
       </div>
     </div>

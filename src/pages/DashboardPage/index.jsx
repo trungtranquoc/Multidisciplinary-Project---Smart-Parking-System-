@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Header from "../../components/Header";
-import "./index.css"
 import SlotProgress from "../../components/PieChartStatus";
 import { Bike, MapPin, Clock, Hourglass } from 'lucide-react';
 import ParkingHistoryChart from "../../components/ParkingHistoryChart";
@@ -9,13 +8,13 @@ const DashboardPage = () => {
   const [isLoading, setIsLoading] = useState(true)
   
   const parkingData = [
-    { day: '2025-04-14', start: 18, end: 20 },
-    { day: '2025-04-15', start: 7, end: 9 },
-    { day: '2025-04-16', start: 17, end: 19 },
-    { day: '2025-04-17', start: 13, end: 14 },
-    { day: '2025-04-18', start: 8, end: 18 },
-    { day: '2025-04-19', start: 10, end: 20 },
-    { day: '2025-04-20', start: 10, end: 20 },
+    { day: '2025-04-07', start: 18, end: 20 },
+    { day: '2025-04-08', start: 7, end: 9 },
+    { day: '2025-04-09', start: 17, end: 19 },
+    { day: '2025-04-10', start: 13, end: 14 },
+    { day: '2025-04-11', start: 8, end: 18 },
+    { day: '2025-04-12', start: 10, end: 20 },
+    { day: '2025-04-13', start: 10, end: 20 },
   ];
 
   useEffect(() => {
