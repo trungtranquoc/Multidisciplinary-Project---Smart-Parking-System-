@@ -104,14 +104,14 @@ const DashboardPage = () => {
               <span className="text-3xl">🌡️</span>
               <p className="text-2xl font-bold ml-2">{lotData.humidity_log[0].humidity * 100}%</p>
             </div>
-            <button className="text-sm underline mt-4 text-white">Turn on / off the ventilation</button>
+            <button className="text-sm underline mt-4 text-white" onClick={() => {window.location.href='monitoring'}}>Turn on / off the ventilation</button>
           </div>
 
           {/* Light Card */}
           <div className="flex-1 min-w-[200px] bg-yellow-200 rounded-xl shadow p-4 flex flex-col justify-between">
             <p className="text-lg font-medium">Light</p>
             <p className="text-xl font-bold mt-2">OK</p>
-            <button className="text-sm text-yellow-800 underline mt-4">Turn on / off the lights</button>
+            <button className="text-sm text-yellow-800 underline mt-4" onClick={() => {window.location.href='monitoring'}}>Turn on / off the lights</button>
           </div>
 
         </div>
